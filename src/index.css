@@ -525,3 +525,217 @@ body {
     border: 1px solid #eeeeee;
 }
 
+/* ==========================================================================
+   ESTILOS DA TELA DE PRODUTOS (Baseado em Estoque e Reserva)
+   ========================================================================== */
+
+.produtos-container {
+    padding: 20px;
+    background-color: #fff; /* Fundo branco para a área principal */
+    min-height: 100%;
+}
+
+/* Cabeçalho da seção de produtos (Título e Botão Novo) */
+.produtos-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 25px;
+    padding-bottom: 15px;
+    border-bottom: 2px solid #f2e6d9; /* Linha sutil bege */
+}
+
+.produtos-header h1 {
+    color: #7b4f39; /* Marrom padrão */
+    font-size: 28px;
+    margin: 0;
+}
+
+/* Botão "Novo Produto" - Estilo parecido com o botão Login/Reservar */
+.btn-novo-produto {
+    background-color: #7b4f39;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 6px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: background 0.3s;
+    font-size: 14px;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+}
+
+.btn-novo-produto:hover {
+    background-color: #5c3b2d;
+}
+
+/* --- TABELA DE PRODUTOS (Replicando o estilo do Estoque) --- */
+
+.produtos-table-wrapper {
+    background: white;
+    border-radius: 8px;
+    overflow: hidden; /* Para arredondar os cantos da tabela */
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+}
+
+.produtos-table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.produtos-table th {
+    background: #7b4f39; /* Cabeçalho Marrom */
+    color: white;
+    padding: 15px;
+    text-align: center;
+    font-weight: bold;
+    text-transform: uppercase;
+    font-size: 12px;
+    letter-spacing: 0.5px;
+}
+
+.produtos-table td {
+    padding: 12px 15px;
+    border-bottom: 1px solid #eee;
+    color: #333;
+    font-size: 14px;
+}
+
+.produtos-table tr:last-child td {
+    border-bottom: none;
+}
+
+.produtos-table tr:hover {
+    background-color: #f2e6d9; /* Efeito hover bege igual ao estoque */
+}
+
+/* Botões de Ação dentro da tabela */
+.btn-acao {
+    border: none;
+    padding: 6px 12px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-weight: bold;
+    font-size: 12px;
+    margin-right: 5px;
+    transition: opacity 0.2s;
+}
+
+.btn-editar {
+    background-color: #f2cf3a; /* Amarelo */
+    color: #7b4f39;
+}
+
+.btn-excluir {
+    background-color: #e74c3c; /* Vermelho suave */
+    color: white;
+}
+
+.btn-acao:hover {
+    opacity: 0.8;
+}
+
+.modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+}
+
+
+.modal-card {
+    background-color: #f2dbc9; 
+    border-radius: 8px;
+    width: 100%;
+    max-width: 450px;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+    text-align: center;
+    animation: slideDown 0.3s ease-out;
+}
+
+@keyframes slideDown {
+    from { transform: translateY(-20px); opacity: 0; }
+    to { transform: translateY(0); opacity: 1; }
+}
+
+.modal-card h2 {
+    color: #7b4f39;
+    margin-top: 0;
+    margin-bottom: 10px;
+    font-size: 24px;
+}
+
+.modal-subtitulo {
+    color: #666;
+    font-size: 14px;
+    margin-bottom: 25px;
+}
+
+/* Estilo dos Inputs dentro do Modal */
+.form-group {
+    margin-bottom: 15px;
+    text-align: left; /* Labels alinhados à esquerda */
+}
+
+.form-group label {
+    display: block;
+    color: #5c3b2d;
+    font-weight: bold;
+    margin-bottom: 5px;
+    font-size: 14px;
+}
+
+.form-group input {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    font-size: 14px;
+    box-sizing: border-box; /* Garante que o padding não estoure a largura */
+    background-color: white;
+}
+
+.form-group input:focus {
+    border-color: #7b4f39;
+    outline: none;
+}
+
+/* Botões do formulário */
+.modal-buttons {
+    display: flex;
+    justify-content: space-between;
+    gap: 10px;
+    margin-top: 25px;
+}
+
+.btn-cancelar {
+    background-color: #999;
+    color: white;
+    border: none;
+    padding: 12px;
+    border-radius: 5px;
+    cursor: pointer;
+    width: 100%;
+    font-weight: bold;
+}
+
+.btn-salvar {
+    background-color: #7b4f39; /* Marrom */
+    color: white;
+    border: none;
+    padding: 12px;
+    border-radius: 5px;
+    cursor: pointer;
+    width: 100%;
+    font-weight: bold;
+}
+
+.btn-salvar:hover {
+    background-color: #5c3b2d;
+}
