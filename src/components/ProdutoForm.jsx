@@ -1,133 +1,118 @@
-import React, { useState } from 'react';
-import { postProduto } from '../services/api'; 
+import React, { useState, useEffect } from 'react';
+import { postProduto, updateProduto } from '../services/api';
 
-export default function ProdutoForm({ onSuccess, onCancel }) {
-  const [formData, setFormData] = useState({
-    Nome: '',
-    Categoria: '',
-    DataValidade: '', 
-  });
-  const [statusMessage, setStatusMessage] = useState({ text: '', type: '' });
-  const [isSubmitting, setIsSubmitting] = useState(false);
+export default function ProdutoForm({ produto, onSuccess, onCancel }) {
+  const [nome, setNome] = useState('');
+  const [categoria, setCategoria] = useState('');
+  const [dataValidade, setDataValidade] = useState('');
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null);
 
-  const handleChange = (e) => {
-    const { name, value } = e.target;
-    setFormData(prev => ({
-      ...prev,
-      [name]: value,
-    }));
-  };
+  useEffect(() => {
+    if (produto) {
+      setNome(produto.Nome || '');
+      setCategoria(produto.Categoria || '');
+      
+      if (produto.DataValidade) {
+        setDataValidade(produto.DataValidade.substring(0, 10));
+      }
+    } else {
+      setNome('');
+      setCategoria('');
+      setDataValidade('');
+    }
+  }, [produto]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setIsSubmitting(true);
-    setStatusMessage({ text: 'Salvando produto...', type: 'info' });
+    setLoading(true);
+    setError(null);
 
-    const produtoParaEnviar = {
-      Nome: formData.Nome,
-      Categoria: formData.Categoria,
-      DataValidade: formData.DataValidade, 
+    const payload = {
+      Nome: nome,
+      Categoria: categoria,
+      DataValidade: new Date(dataValidade).toISOString() 
     };
-    
+
     try {
-      const produtoCriado = await postProduto(produtoParaEnviar);
-      
-      setStatusMessage({ text: `Produto "${produtoCriado.Nome}" criado com sucesso!`, type: 'success' });
-      setFormData({ Nome: '', Categoria: '', DataValidade: '' });
+      let resultado;
 
-      if (onSuccess) {
-        onSuccess(produtoCriado); 
+      if (produto && produto.Id) {
+        resultado = await updateProduto(produto.Id, payload);
+      } else {
+        resultado = await postProduto(payload);
       }
-      
-      setTimeout(onCancel, 2000); 
 
-    } catch (error) {
-      console.error('Erro no formulário:', error);
-      setStatusMessage({ text: `Erro ao criar: ${error.message}`, type: 'error' });
+      onSuccess(resultado);
+      
+    } catch (err) {
+      console.error(err);
+      setError("Erro ao salvar o produto. Verifique os dados.");
     } finally {
-      setIsSubmitting(false);
+      setLoading(false);
     }
   };
 
   return (
-    <div className="bg-white p-6 rounded-lg shadow-xl w-full max-w-md mx-auto">
-      <h2 className="text-2xl font-bold mb-4 text-gray-800">Cadastrar Novo Produto</h2>
+    <div className="bg-white p-6 rounded-lg shadow-xl w-full max-w-md">
+      <h2 className="text-2xl font-bold mb-4 text-gray-800">
+        {produto ? 'Editar Produto' : 'Novo Produto'}
+      </h2>
+
+      {error && <div className="mb-4 p-2 bg-red-100 text-red-700 rounded">{error}</div>}
 
       <form onSubmit={handleSubmit} className="space-y-4">
         <div>
-          <label htmlFor="Nome" className="block text-sm font-medium text-gray-700">Nome</label>
+          <label className="block text-sm font-medium text-gray-700">Nome</label>
           <input
             type="text"
-            id="Nome"
-            name="Nome"
-            value={formData.Nome}
-            onChange={handleChange}
             required
-            className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2 focus:ring-blue-500 focus:border-blue-500"
+            value={nome}
+            onChange={(e) => setNome(e.target.value)}
+            className="mt-1 block w-full rounded-md border-gray-300 shadow-sm border p-2 focus:border-blue-500 focus:ring-blue-500"
           />
         </div>
 
         <div>
-          <label htmlFor="Categoria" className="block text-sm font-medium text-gray-700">Categoria</label>
+          <label className="block text-sm font-medium text-gray-700">Categoria</label>
           <input
             type="text"
-            id="Categoria"
-            name="Categoria"
-            value={formData.Categoria}
-            onChange={handleChange}
             required
-            className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2 focus:ring-blue-500 focus:border-blue-500"
+            value={categoria}
+            onChange={(e) => setCategoria(e.target.value)}
+            className="mt-1 block w-full rounded-md border-gray-300 shadow-sm border p-2 focus:border-blue-500 focus:ring-blue-500"
           />
         </div>
 
         <div>
-          <label htmlFor="DataValidade" className="block text-sm font-medium text-gray-700">Data Validade</label>
+          <label className="block text-sm font-medium text-gray-700">Validade</label>
           <input
             type="date"
-            id="DataValidade"
-            name="DataValidade"
-            value={formData.DataValidade}
-            onChange={handleChange}
             required
-            className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2 focus:ring-blue-500 focus:border-blue-500"
+            value={dataValidade}
+            onChange={(e) => setDataValidade(e.target.value)}
+            className="mt-1 block w-full rounded-md border-gray-300 shadow-sm border p-2 focus:border-blue-500 focus:ring-blue-500"
           />
         </div>
 
-        <div className="flex justify-end space-x-3 pt-4">
+        <div className="flex justify-end space-x-3 mt-6">
           <button
             type="button"
             onClick={onCancel}
-            className="px-4 py-2 text-sm font-medium text-gray-700 bg-gray-200 rounded-md hover:bg-gray-300 transition duration-150"
+            className="px-4 py-2 text-sm font-medium text-gray-700 bg-gray-100 hover:bg-gray-200 rounded-md"
+            disabled={loading}
           >
             Cancelar
           </button>
           <button
             type="submit"
-            disabled={isSubmitting}
-            className={`px-4 py-2 text-sm font-medium text-white rounded-md transition duration-150 ${
-              isSubmitting 
-                ? 'bg-gray-400 cursor-not-allowed' 
-                : 'bg-green-600 hover:bg-green-700 shadow-md'
-            }`}
+            disabled={loading}
+            className="px-4 py-2 text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 rounded-md disabled:bg-blue-300"
           >
-            {isSubmitting ? 'Salvando...' : 'Criar Produto'}
+            {loading ? 'Salvando...' : (produto ? 'Salvar Alterações' : 'Criar Produto')}
           </button>
         </div>
       </form>
-
-      {statusMessage.text && (
-        <div 
-          className={`mt-4 p-3 rounded-md text-sm ${
-            statusMessage.type === 'error' 
-              ? 'bg-red-100 text-red-700' 
-              : statusMessage.type === 'success'
-              ? 'bg-green-100 text-green-700'
-              : 'bg-blue-100 text-blue-700'
-          }`}
-        >
-          {statusMessage.text}
-        </div>
-      )}
     </div>
   );
 }

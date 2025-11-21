@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { getProdutos } from '../services/api'; 
+import { getProdutos, deleteProduto, updateProduto } from '../services/api'; 
 import ProdutoForm from '../components/ProdutoForm';
 
 export default function Produtos() {
@@ -8,6 +8,7 @@ export default function Produtos() {
   const [error, setError] = useState(null);
   
   const [isCreating, setIsCreating] = useState(false); 
+  const [editingProduto, setEditingProduto] = useState(null);
 
   async function carregarProdutos() {
     setLoading(true);
@@ -26,16 +27,41 @@ export default function Produtos() {
     carregarProdutos();
   }, []);
 
-  const handleProdutoCreated = (novoProduto) => {
-    setListaProdutos(prev => [...prev, novoProduto]);
-    setIsCreating(false); 
+  const fecharModal = () => {
+    setIsCreating(false);
+    setEditingProduto(null);
   };
 
-  const deletarProduto = (id) => {
-    console.log(`Função DELETAR chamada para o ID: ${id}`);
+  const handleProdutoCreated = (novoProduto) => {
+    setListaProdutos(prev => [...prev, novoProduto]);
+    fecharModal(); 
   };
+
+  const handleProdutoUpdated = (produtoAtualizado) => {
+    setListaProdutos(prev => prev.map(produto => 
+      produto.Id === produtoAtualizado.Id ? produtoAtualizado : produto
+    ));
+    fecharModal();
+  };
+
+  const deletarProduto = async (id) => {
+    const confirmacao = window.confirm("Tem certeza que deseja excluir este produto?");
+    
+    if (!confirmacao) return;
+
+    try {
+      await deleteProduto(id);
+      setListaProdutos(prevLista => prevLista.filter(produto => produto.Id !== id));
+      setError(null);       
+    } catch (err) {
+      console.error(err);
+      alert("Erro ao excluir o produto. Tente novamente.");
+    }
+  };
+
   const editarProduto = (produto) => {
-    console.log(`Função EDITAR chamada para: ${produto.Nome}`);
+    setEditingProduto(produto);
+    setIsCreating(false);    
   };
   
   if (loading) {
@@ -52,18 +78,22 @@ export default function Produtos() {
       
       <div className="mb-6">
         <button
-          onClick={() => setIsCreating(true)} 
+          onClick={() => {
+            setEditingProduto(null); 
+            setIsCreating(true);
+          }} 
           className="bg-blue-600 text-white px-6 py-2 rounded-lg font-semibold shadow-md hover:bg-blue-700 transition duration-200"
         >
           + Novo Produto
         </button>
       </div>
 
-      {isCreating && (
+      {(isCreating || editingProduto) && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
           <ProdutoForm 
-            onSuccess={handleProdutoCreated}
-            onCancel={() => setIsCreating(false)}
+            produto={editingProduto}        
+            onSuccess={editingProduto ? handleProdutoUpdated : handleProdutoCreated}         
+            onCancel={fecharModal}
           />
         </div>
       )}
@@ -85,7 +115,7 @@ export default function Produtos() {
                 <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{produto.Id}</td>
                 <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{produto.Nome}</td>
                 <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{produto.Categoria}</td>
-                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{produto.DataValidade.substring(0, 10)}</td>
+                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{produto.DataValidade ? produto.DataValidade.substring(0, 10) : ''}</td>
                 <td className="px-6 py-4 whitespace-nowrap text-center text-sm font-medium space-x-2">
                   <button onClick={() => editarProduto(produto)} className="text-indigo-600 hover:text-indigo-900">Editar</button>
                   <button onClick={() => deletarProduto(produto.Id)} className="text-red-600 hover:text-red-900">Excluir</button>
