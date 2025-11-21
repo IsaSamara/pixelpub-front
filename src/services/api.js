@@ -21,3 +21,27 @@ export const getProdutos = async () => {
   }
 };
 
+export const postProduto = async (novoProduto) => {
+  try {
+    const response = await fetch(`${API_BASE_URL}/produtos/`, {
+      method: 'POST',
+      headers: {
+        'accept': 'application/json',
+        'Content-Type': 'application/json', 
+      },
+      body: JSON.stringify(novoProduto), 
+    });
+
+    if (response.status === 201 || response.status === 200) {
+      const data = await response.json();
+      return data;
+    } else {
+      const errorText = await response.text();
+      console.error(`Erro ao criar produto. Status: ${response.status}`, errorText);
+      throw new Error(`Erro ao criar produto: ${response.status} - ${errorText}`);
+    }  
+  } catch (error) {
+    console.error("Falha na requisição POST de produtos:", error);
+    throw error;
+  }
+};
