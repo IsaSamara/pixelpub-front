@@ -15,6 +15,7 @@ import Home from "./pages/Home"
 import Cadastro from "./pages/Cadastro"
 import Estoque from "./pages/Estoque"
 import Reserva from "./pages/Reserva"
+import Produtos from "./pages/Produtos"
 
 
 //DEFININDO COMPONENTE PRINCIPAL-----------------------------------------
@@ -35,6 +36,7 @@ export default function App() {
               <Route path="/estoque" element={<Estoque />} />
                 {/* CORRIGIDO: 'elements' para 'element' e 'Reserva' para 'reserva' na path */}
               <Route path="/reserva" element={<Reserva />} /> 
+              <Route path="/produtos" element={<Produtos />} />
            </Routes>
       </main>
    </div>

@@ -15,6 +15,7 @@ export default function Navbar() {
              <Link to="/cadastro">CADASTRO</Link>
              <Link to="/estoque">ESTOQUE</Link>
              <Link to="/reserva">RESERVA</Link>
+             <Link to="/produtos">PRODUTOS</Link>
         </nav>
 
      <button className="login-btn">LOGIN</button>
